@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ych.core.dao.mybatis.SystemParameterMapper">
+  <resultMap type="com.ych.core.model.SystemParameter" id="systemParameter">
+    <id column="id" property="id" jdbcType="NUMERIC"/>
+    <result column="appkey" property="appKey" jdbcType="VARCHAR"/>
+    <result column="key" property="key" jdbcType="VARCHAR"/>
+    <result column="type" property="type" jdbcType="NUMERIC"/>
+    <result column="value" property="stringValue" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <!-- 查询指定应用的参数 -->
+  <select id="selectAppParam" parameterType="map" resultMap="systemParameter">
+SELECT * FROM t_systemparam WHERE appkey = #{appKey,jdbcType=VARCHAR} AND `key` = #{key,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 查询全局参数 -->
+  <select id="selectGlobalParam" parameterType="string" resultMap="systemParameter">
+SELECT * FROM t_systemparam WHERE appkey = '' AND `key` = #{key,jdbcType=VARCHAR}
+  </select>
+</mapper>
