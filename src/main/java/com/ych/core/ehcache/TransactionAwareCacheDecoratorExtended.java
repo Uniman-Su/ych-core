@@ -2,6 +2,8 @@ package com.ych.core.ehcache;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.transaction.TransactionAwareCacheDecorator;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 处理EHCACHE放入缓存的时候不走原来的事务缓存
@@ -33,5 +35,19 @@ public class TransactionAwareCacheDecoratorExtended extends TransactionAwareCach
     @Override
     public void put(final Object key, final Object value) {
         this.targetCache.put(key, value);
+    }
+
+    @Override
+    public void evict(final Object key) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    TransactionAwareCacheDecoratorExtended.this.targetCache.evict(key);
+                }
+            });
+        }
+
+        this.targetCache.evict(key);
     }
 }
